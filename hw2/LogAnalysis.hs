@@ -24,6 +24,24 @@ insert _ tree = tree
 build :: [LogMessage] -> MessageTree
 build = foldr insert Leaf    
 
+inorder :: MessageTree -> [LogMessage]
+inorder Leaf = []
+inorder (Node left lmsg right) = inorder left ++ [lmsg] ++ inorder right
+
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong = extractMessage . inorder . build . filter (severe 50)
+
+severe :: Int -> LogMessage -> Bool
+severe minLv1 (LogMessage (Error lvl) _ _ )
+    | lvl > minLv1 = True
+    | otherwise = False
+severe _ _ = False
+
+extractMessage :: [LogMessage] -> [String]
+extractMessage (LogMessage _ _ msg : msgs) = msg :extractMessage msgs    
+extractMessage _  = []
+
 -- ex3
 
 
